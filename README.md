@@ -30,9 +30,4 @@ La app permite:
 - **Noel López Pérez**
 - **Arli Andrei Avendaño Avendaño**
 
-## 💻 Cómo probarlo
 
-1. Clona el repositorio:
-
-```bash
-git clone https://github.com/tu-usuario/tu-repo.git
