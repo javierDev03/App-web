@@ -20,9 +20,6 @@ La app permite:
 - 🎨 [Tailwind CSS](https://tailwindcss.com/)
 - 🌍 HTML + JavaScript (sin frameworks)
 
-## 🚀 Captura
-
-![Captura](./screenshot.png) <!-- (Agrega una captura si deseas) -->
 
 ## 👥 Integrantes
 
