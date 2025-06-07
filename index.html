@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notas CRUD</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 p-6 font-sans">
+
+  <div class="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4 text-center">📝 Mis Notas (CRUD)</h1>
+
+    <div class="flex gap-2 mb-4">
+      <input id="note" type="text" placeholder="Escribe una nota" class="flex-grow px-4 py-2 border rounded focus:outline-none">
+      <button id="saveBtn" onclick="guardarNota()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Guardar</button>
+    </div>
+
+    <ul id="notas" class="space-y-2"></ul>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/11.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCsmEwho8eqMA7hb89q91Q6JjrM-veB2o4",
+      authDomain: "practica-3c397.firebaseapp.com",
+      projectId: "practica-3c397",
+      storageBucket: "practica-3c397.firebasestorage.app",
+      messagingSenderId: "949501695075",
+      appId: "1:949501695075:web:22fef4eb91a6f767381456",
+      measurementId: "G-G7143PQCR3"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const notasRef = collection(db, "notas");
+
+    let notaEditando = null;
+
+    // Guardar o editar nota
+    window.guardarNota = async () => {
+      const input = document.getElementById("note");
+      const texto = input.value.trim();
+      if (!texto) return;
+
+      if (notaEditando) {
+        await updateDoc(doc(db, "notas", notaEditando), { texto });
+        notaEditando = null;
+        document.getElementById("saveBtn").textContent = "Guardar";
+      } else {
+        await addDoc(notasRef, { texto });
+      }
+
+      input.value = "";
+    };
+
+    // Mostrar en tiempo real
+    const lista = document.getElementById("notas");
+    onSnapshot(notasRef, (snapshot) => {
+      lista.innerHTML = "";
+      snapshot.forEach((docSnap) => {
+        const { texto } = docSnap.data();
+
+        const li = document.createElement("li");
+        li.className = "bg-blue-100 px-4 py-2 rounded flex justify-between items-center";
+
+        const span = document.createElement("span");
+        span.textContent = texto;
+
+        const actions = document.createElement("div");
+        actions.className = "flex gap-2";
+
+        const editarBtn = document.createElement("button");
+        editarBtn.textContent = "✏️";
+        editarBtn.className = "text-blue-600";
+        editarBtn.onclick = () => {
+          document.getElementById("note").value = texto;
+          notaEditando = docSnap.id;
+          document.getElementById("saveBtn").textContent = "Actualizar";
+        };
+
+        const eliminarBtn = document.createElement("button");
+        eliminarBtn.textContent = "🗑️";
+        eliminarBtn.className = "text-red-600";
+        eliminarBtn.onclick = async () => {
+          await deleteDoc(doc(db, "notas", docSnap.id));
+        };
+
+        actions.append(editarBtn, eliminarBtn);
+        li.append(span, actions);
+        lista.appendChild(li);
+      });
+    });
+  </script>
+</body>
+<footer class="text-center text-sm text-gray-600 mt-10">
+  <p class="flex items-center justify-center gap-1">
+    Hecho con <span class="text-red-500">❤️</span> por <strong class="text-blue-600">javierdev</strong> —
+    <a href="https://github.com/javierDev03" target="_blank" class="hover:underline flex items-center gap-1">
+      GitHub
+      <svg class="w-4 h-4 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
+        <path fill-rule="evenodd" d="M12 0C5.37 0 0 5.373 0 12c0 5.303 3.438 9.8 8.207 11.387.6.11.793-.26.793-.577v-2.04c-3.338.726-4.033-1.61-4.033-1.61-.546-1.386-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.84 1.235 1.84 1.235 1.07 1.834 2.807 1.304 3.492.997.107-.776.418-1.305.76-1.605-2.665-.306-5.467-1.332-5.467-5.93 0-1.31.47-2.38 1.235-3.22-.124-.303-.535-1.527.117-3.176 0 0 1.008-.322 3.3 1.23a11.513 11.513 0 013.003-.404c1.02.005 2.047.138 3.003.404 2.29-1.552 3.296-1.23 3.296-1.23.654 1.649.243 2.873.12 3.176.77.84 1.232 1.91 1.232 3.22 0 4.61-2.807 5.62-5.48 5.92.43.372.814 1.103.814 2.222v3.293c0 .32.192.694.8.576C20.565 21.796 24 17.3 24 12c0-6.627-5.373-12-12-12z" clip-rule="evenodd"/>
+      </svg>
+    </a>
+  </p>
+</footer>
+
+</html>
